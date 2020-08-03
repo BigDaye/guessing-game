@@ -1,5 +1,5 @@
 /*------Constants------*/
-
+const victory = new Audio('audio/victory.wav');
 /*------Variables------*/
 let secretNum, guessList, isWinner, currentGuess;
 
@@ -9,7 +9,7 @@ const guessEl = document.getElementById('prevGuesses');
 const guessBtn = document.getElementById('guessButton');
 const resetBtn = document.getElementById('resetButton');
 const guessInput = document.getElementById('guessInput');
-
+const titleEl = document.getElementById('title')
 
 /*------Event Listeners------*/
 
@@ -35,6 +35,8 @@ init();
 
 function init() {
     //Easy way to remove all appended children from element.
+    messageEl.className = '';
+    titleEl.className = '';
     guessEl.innerText = '';
     messageEl.innerText = 'Please enter a number between 1 and 100';
     guessInput.value = '';
@@ -42,31 +44,38 @@ function init() {
     isWinner = false;
     secretNum = Math.floor(Math.random() * 100) + 1;
 }
-function checkGuess(guess){
+function checkGuess(guess) {
     if ( guess < 1 || guess > 100) {
         messageEl.innerText = `Whoops! Please enter a number between 1 and 100!`;
     } else if (guess === secretNum) {
-        //win scencario]
-        confetti.start(3000)
+        //win scencario
+        titleEl.className = 'animated wobble'
         messageEl.className = 'winner';
+        guessList.push(guess);
+        guessInput.value = '';
         isWinner = true;
+        confetti.start(3000);
+        setTimeout(function(){victory.play();},1000);
         if (guessList.length === 0) {
-            messageEl.innerText = `Congrats! You found the number in ${guessList.length} guess!`
+            messageEl.innerText = `Congrats! You found the number in ${guessList.length} guess!`;
         } else {
-            messageEl.innerText = `Congrats! You found the number in ${guessList.length} guesses!`
+            messageEl.innerText = `Congrats! You found the number in ${guessList.length} guesses!`;
         }
         console.log(guess, 'is perfect')
+        render(guess);
     } else if (guess < secretNum) {
         //handle guess too low
         messageEl.innerText = `your guess of ${guess} is too low.`;
         messageEl.className = 'low';
         guessList.push(guess);
+        guessInput.value = '',
         console.log(guess, 'is too low');
         render(guess);
     } else {
         // guess too high
         messageEl.innerText = `your guess of ${guess} is too high.`;
         messageEl.className = 'high';
+        guessInput.value = '',
         guessList.push(guess);
         console.log(guess, 'is too high');
         render(guess);
@@ -74,7 +83,7 @@ function checkGuess(guess){
 }
 
 function render(guess) {
-    //append chide div to guessEl div based on whether our guess is higher or lower than secretNum
+    //append child div to guessEl div based on whether our guess is higher or lower than secretNum
 
     if (guess === secretNum) {
         let div = document.createElement('div');
